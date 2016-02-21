@@ -53,7 +53,7 @@ public final class UDPSocket {
         }
     }
 
-    public func send(ip ip: IP, data: Data, deadline: Deadline = noDeadline) throws {
+    public func send(ip ip: IP, data: Data, deadline: Deadline = never) throws {
         try assertNotClosed()
 
         data.withUnsafeBufferPointer {
@@ -63,7 +63,7 @@ public final class UDPSocket {
         try UDPError.assertNoError()
     }
 
-    public func receive(length length: Int, deadline: Deadline = noDeadline) throws -> (Data, IP) {
+    public func receive(length length: Int, deadline: Deadline = never) throws -> (Data, IP) {
         try assertNotClosed()
 
         var address = ipaddr()
