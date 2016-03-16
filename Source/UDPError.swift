@@ -25,7 +25,7 @@
 @_exported import System
 @_exported import Data
 
-public enum UDPError: ErrorType {
+public enum UDPError: ErrorProtocol {
     case Unknown(description: String)
     case ConnectionResetByPeer(description: String, data: Data)
     case NoBufferSpaceAvailabe(description: String, data: Data)
@@ -51,7 +51,7 @@ public enum UDPError: ErrorType {
     }
 
     static var lastErrorDescription: String {
-        return String.fromCString(strerror(errno))!
+        return String(cString: strerror(errno))
     }
 
     static var lastError: UDPError {
