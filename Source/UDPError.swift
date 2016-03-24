@@ -22,15 +22,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@_exported import System
-@_exported import Data
-
 public enum UDPError: ErrorProtocol {
-    case Unknown(description: String)
-    case ConnectionResetByPeer(description: String, data: Data)
-    case NoBufferSpaceAvailabe(description: String, data: Data)
-    case OperationTimedOut(description: String, data: Data)
-    case ClosedSocket(description: String)
+    case unknown(description: String)
+    case connectionResetByPeer(description: String, data: Data)
+    case noBufferSpaceAvailabe(description: String, data: Data)
+    case operationTimedOut(description: String, data: Data)
+    case closedSocket(description: String)
 
     static func lastReceiveErrorWithData(source: Data, bytesProcessed: Int) -> UDPError {
         let data = source.prefix(bytesProcessed)
@@ -40,13 +37,13 @@ public enum UDPError: ErrorProtocol {
     static func lastErrorWithData(data: Data) -> UDPError {
         switch errno {
         case ECONNRESET:
-            return .ConnectionResetByPeer(description: lastErrorDescription, data: data)
+            return .connectionResetByPeer(description: lastErrorDescription, data: data)
         case ENOBUFS:
-            return .NoBufferSpaceAvailabe(description: lastErrorDescription, data: data)
+            return .noBufferSpaceAvailabe(description: lastErrorDescription, data: data)
         case ETIMEDOUT:
-            return .OperationTimedOut(description: lastErrorDescription, data: data)
+            return .operationTimedOut(description: lastErrorDescription, data: data)
         default:
-            return .Unknown(description: lastErrorDescription)
+            return .unknown(description: lastErrorDescription)
         }
     }
 
@@ -56,11 +53,11 @@ public enum UDPError: ErrorProtocol {
 
     static var lastError: UDPError {
         // TODO: Switch on errno
-        return .Unknown(description: lastErrorDescription)
+        return .unknown(description: lastErrorDescription)
     }
 
     static var closedSocketError: UDPError {
-        return UDPError.ClosedSocket(description: "Closed socket")
+        return UDPError.closedSocket(description: "Closed socket")
     }
 
     static func assertNoError() throws {
@@ -79,15 +76,15 @@ public enum UDPError: ErrorProtocol {
 extension UDPError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case Unknown(let description):
+        case unknown(let description):
             return description
-        case ConnectionResetByPeer(let description, _):
+        case connectionResetByPeer(let description, _):
             return description
-        case NoBufferSpaceAvailabe(let description, _):
+        case noBufferSpaceAvailabe(let description, _):
             return description
-        case OperationTimedOut(let description, _):
+        case operationTimedOut(let description, _):
             return description
-        case ClosedSocket(let description):
+        case closedSocket(let description):
             return description
         }
     }
