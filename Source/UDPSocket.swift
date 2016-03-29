@@ -73,7 +73,7 @@ public final class UDPSocket {
 
         try UDPError.assertNoReceiveErrorWithData(data, bytesProcessed: bytesProcessed)
 
-        let processedData = data.prefix(bytesProcessed)
+        let processedData = Data(data.prefix(bytesProcessed))
         let ip = try IP(address: address)
         return (processedData, ip)
     }

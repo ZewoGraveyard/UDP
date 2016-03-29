@@ -30,7 +30,7 @@ public enum UDPError: ErrorProtocol {
     case closedSocket(description: String)
 
     static func lastReceiveErrorWithData(source: Data, bytesProcessed: Int) -> UDPError {
-        let data = source.prefix(bytesProcessed)
+        let data = Data(source.prefix(bytesProcessed))
         return lastErrorWithData(data)
     }
 
