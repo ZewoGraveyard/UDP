@@ -26,7 +26,7 @@ import CLibvenice
 @_exported import IP
 
 public final class UDPSocket {
-    private var socket: udpsock
+    private var socket: udpsock?
     public private(set) var closed = false
 
     public var port: Int {
@@ -52,7 +52,7 @@ public final class UDPSocket {
         }
     }
 
-    public func send(ip ip: IP, data: Data, deadline: Double = .never) throws {
+    public func send(ip: IP, data: Data, deadline: Double = .never) throws {
         try assertNotClosed()
 
         data.withUnsafeBufferPointer {
@@ -72,7 +72,7 @@ public final class UDPSocket {
             udprecv(socket, &address, $0.baseAddress, $0.count, deadline.int64milliseconds)
         }
 
-        try UDPError.assertNoReceiveErrorWithData(data, bytesProcessed: bytesProcessed)
+        try UDPError.assertNoReceiveError(withData: data, bytesProcessed: bytesProcessed)
 
         let processedData = Data(data.prefix(bytesProcessed))
         let ip = try IP(address: address)

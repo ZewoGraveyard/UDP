@@ -29,12 +29,12 @@ public enum UDPError: ErrorProtocol {
     case operationTimedOut(description: String, data: Data)
     case closedSocket(description: String)
 
-    static func lastReceiveErrorWithData(source: Data, bytesProcessed: Int) -> UDPError {
+    static func lastReceiveError(withData source: Data, bytesProcessed: Int) -> UDPError {
         let data = Data(source.prefix(bytesProcessed))
-        return lastErrorWithData(data)
+        return lastError(withData: data)
     }
 
-    static func lastErrorWithData(data: Data) -> UDPError {
+    static func lastError(withData data: Data) -> UDPError {
         switch errno {
         case ECONNRESET:
             return .connectionResetByPeer(description: lastErrorDescription, data: data)
@@ -66,9 +66,9 @@ public enum UDPError: ErrorProtocol {
         }
     }
 
-    static func assertNoReceiveErrorWithData(data: Data, bytesProcessed: Int) throws {
+    static func assertNoReceiveError(withData data: Data, bytesProcessed: Int) throws {
         if errno != 0 {
-            throw UDPError.lastReceiveErrorWithData(data, bytesProcessed: bytesProcessed)
+            throw UDPError.lastReceiveError(withData: data, bytesProcessed: bytesProcessed)
         }
     }
 }
