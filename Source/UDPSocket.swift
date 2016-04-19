@@ -25,85 +25,86 @@
 import CLibvenice
 @_exported import IP
 
+public enum UDPError: ErrorProtocol {
+    case didSendDataWithError(error: SystemError, remaining: Data)
+    case didReceiveDataWithError(error: SystemError, received: Data)
+}
+
+extension UDPError: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case didSendDataWithError(let error, _): return "\(error)"
+        case didReceiveDataWithError(let error, _): return "\(error)"
+        }
+    }
+}
+
 public final class UDPSocket {
-    private var socket: udpsock
+    private var socket: udpsock?
     public private(set) var closed = false
 
     public var port: Int {
         return Int(udpport(socket))
     }
 
-    public init(socket: udpsock) throws {
+    internal init(socket: udpsock) {
         self.socket = socket
-        try UDPError.assertNoError()
     }
 
     public convenience init(ip: IP) throws {
-        try self.init(socket: udplisten(ip.address))
-    }
-
-    public convenience init(fileDescriptor: Int32) throws {
-        try self.init(socket: udpattach(fileDescriptor))
+        let socket = udplisten(ip.address)
+        try ensureLastOperationSucceeded()
+        self.init(socket: socket)
     }
 
     deinit {
-        if !closed && socket != nil {
+        if let socket = socket where !closed {
             udpclose(socket)
         }
     }
 
-    public func send(ip ip: IP, data: Data, deadline: Double = .never) throws {
-        try assertNotClosed()
+    public func send(_ data: Data, ip: IP, timingOut deadline: Double = .never) throws {
+        try ensureStreamIsOpen()
 
         data.withUnsafeBufferPointer {
             udpsend(socket, ip.address, $0.baseAddress, $0.count)
         }
 
-        try UDPError.assertNoError()
+        try ensureLastOperationSucceeded()
     }
 
-    public func receive(upTo byteCount: Int, timingOut deadline: Double = .never) throws -> (Data, IP) {
-        try assertNotClosed()
+    public func receive(_ byteCount: Int, timingOut deadline: Double = .never) throws -> (Data, IP) {
+        try ensureStreamIsOpen()
 
         var address = ipaddr()
         var data = Data.buffer(with: byteCount)
 
-        let bytesProcessed = data.withUnsafeMutableBufferPointer {
+        let received = data.withUnsafeMutableBufferPointer {
             udprecv(socket, &address, $0.baseAddress, $0.count, deadline.int64milliseconds)
         }
 
-        try UDPError.assertNoReceiveErrorWithData(data, bytesProcessed: bytesProcessed)
+        let receivedData = Data(data.prefix(received))
 
-        let processedData = Data(data.prefix(bytesProcessed))
-        let ip = try IP(address: address)
-        return (processedData, ip)
-    }
-
-    public func attach(fileDescriptor: FileDescriptor) throws {
-        if !closed {
-            try close()
+        do {
+            try ensureLastOperationSucceeded()
+        } catch let error as SystemError where received > 0 {
+            throw UDPError.didReceiveDataWithError(error: error, received: receivedData)
         }
 
-        socket = udpattach(fileDescriptor)
-        try UDPError.assertNoError()
-        closed = false
-    }
-
-    public func detach() throws -> FileDescriptor {
-        try assertNotClosed()
-        closed = true
-        return udpdetach(socket)
+        let ip = IP(address: address)
+        return (receivedData, ip)
     }
 
     public func close() throws {
-        try assertNotClosed()
-        closed = true
+        try ensureStreamIsOpen()
         udpclose(socket)
+        try ensureLastOperationSucceeded()
+        closed = true
     }
 
-    func assertNotClosed() throws {
+    private func ensureStreamIsOpen() throws {
         if closed {
-            throw UDPError.closedSocketError
+            throw StreamError.closedStream(data: [])
         }
     }
 }
