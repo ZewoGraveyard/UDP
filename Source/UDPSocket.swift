@@ -104,7 +104,7 @@ public final class UDPSocket {
 
     private func ensureStreamIsOpen() throws {
         if closed {
-            throw StreamError.closedStream
+            throw StreamError.closedStream(data: [])
         }
     }
 }
