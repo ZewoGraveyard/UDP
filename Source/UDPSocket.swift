@@ -26,15 +26,15 @@ import CLibvenice
 @_exported import IP
 
 public enum UDPError: ErrorProtocol {
-    case failedToSendCompletely(remaining: Data)
-    case failedToReceiveCompletely(received: Data)
+    case didSendDataWithError(error: SystemError, remaining: Data)
+    case didReceiveDataWithError(error: SystemError, received: Data)
 }
 
 extension UDPError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case failedToSendCompletely: return "Failed to send completely"
-        case failedToReceiveCompletely: return "Failed to receive completely"
+        case didSendDataWithError(let error, _): return "\(error)"
+        case didReceiveDataWithError(let error, _): return "\(error)"
         }
     }
 }
@@ -87,8 +87,8 @@ public final class UDPSocket {
 
         do {
             try ensureLastOperationSucceeded()
-        } catch {
-            throw UDPError.failedToReceiveCompletely(received: receivedData)
+        } catch let error as SystemError where received > 0 {
+            throw UDPError.didReceiveDataWithError(error: error, received: receivedData)
         }
 
         let ip = IP(address: address)
