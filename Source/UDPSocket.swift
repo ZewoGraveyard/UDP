@@ -52,7 +52,9 @@ public final class UDPSocket {
     }
 
     public convenience init(ip: IP) throws {
-        let socket = udplisten(ip.address)
+        guard let socket = udplisten(ip.address) else {
+            throw SystemError.socketTypeNotSupported
+        }
         try ensureLastOperationSucceeded()
         self.init(socket: socket)
     }
