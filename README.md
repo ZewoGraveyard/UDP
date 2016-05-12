@@ -19,6 +19,19 @@ let package = Package(
 )
 ```
 
+## Basic usage
+
+### Send messages
+
+Send a message containing "Hello world" from `localhost:5050` to `localhost:5051`
+
+```swift
+import UDP
+
+let udpSocket = try? UDPSocket(ip: IP(port: 5050))
+try udpSocket?.send(Data("Hello world"), ip: IP(port: 5051))
+```
+
 ## Support
 
 If you need any help you can join our [Slack](http://slack.zewo.io) and go to the **#help** channel. Or you can create a Github [issue](https://github.com/Zewo/Zewo/issues/new) in our main repository. When stating your issue be sure to add enough details, specify what module is causing the problem and reproduction steps.
