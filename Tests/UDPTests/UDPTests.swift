@@ -8,7 +8,7 @@ class UDPTests: XCTestCase {
 }
 
 extension UDPTests {
-    static var allTests : [(String, UDPTests -> () throws -> Void)] {
+    static var allTests : [(String, (UDPTests) -> () throws -> Void)] {
         return [
            ("testReality", testReality),
         ]

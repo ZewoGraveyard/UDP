@@ -23,9 +23,10 @@
 // SOFTWARE.
 
 import CLibvenice
+import C7
 @_exported import IP
 
-public enum UDPError: ErrorProtocol {
+public enum UDPError: Error {
     case didSendDataWithError(error: SystemError, remaining: Data)
     case didReceiveDataWithError(error: SystemError, received: Data)
 }
@@ -33,8 +34,8 @@ public enum UDPError: ErrorProtocol {
 extension UDPError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case didSendDataWithError(let error, _): return "\(error)"
-        case didReceiveDataWithError(let error, _): return "\(error)"
+        case .didSendDataWithError(let error, _): return "\(error)"
+        case .didReceiveDataWithError(let error, _): return "\(error)"
         }
     }
 }
@@ -60,7 +61,7 @@ public final class UDPSocket {
     }
 
     deinit {
-        if let socket = socket where !closed {
+        if let socket = socket, !closed {
             udpclose(socket)
         }
     }
