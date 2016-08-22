@@ -1,10 +1,6 @@
-#if os(Linux)
-
 import XCTest
-@testable import UDPTestSuite
+@testable import UDPTests
 
 XCTMain([
     testCase(UDPTests.allTests)
 ])
-
-#endif
