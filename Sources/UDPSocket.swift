@@ -77,7 +77,7 @@ public final class UDPSocket {
         try ensureLastOperationSucceeded()
     }
 
-    public func receive(_ byteCount: Int, timingOut deadline: Double = .never) throws -> (Data, IP) {
+    public func receive(upTo byteCount: Int, timingOut deadline: Double = .never) throws -> (Data, IP) {
         try ensureStreamIsOpen()
 
         var address = ipaddr()
