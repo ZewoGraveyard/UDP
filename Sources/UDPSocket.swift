@@ -24,6 +24,7 @@
 
 import CLibvenice
 import C7
+import POSIX
 @_exported import IP
 
 public enum UDPError: Error {
