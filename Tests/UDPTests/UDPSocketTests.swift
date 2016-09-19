@@ -37,7 +37,7 @@ public class UDPSocketTests : XCTestCase {
     }
 }
 
-extension UDPSocketTest {
+extension UDPSocketTests {
     public static var allTests: [(String, (UDPSocketTests) -> () throws -> Void)] {
         return [
            ("testBasicEcho", testBasicEcho),
