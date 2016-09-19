@@ -1,4 +1,3 @@
-@_exported import Core
 import CLibvenice
 import POSIX
 
