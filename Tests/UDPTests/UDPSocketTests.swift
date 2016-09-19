@@ -3,7 +3,6 @@ import XCTest
 @testable import UDP
 
 public class UDPSocketTests : XCTestCase {
-
     func testBasicEcho() throws {
         let serverSocket = try UDPSocket(ip: IP(port: 5050))
         let clientSocket = try UDPSocket(ip: IP(port: 5051))
@@ -36,11 +35,12 @@ public class UDPSocketTests : XCTestCase {
         let success = comparisonChannel.receive()!
         XCTAssert(success, "Sent and received messages are not equal")
     }
+}
 
-    public static var allTests : [(String, (UDPSocketTests) -> () throws -> Void)] {
+extension UDPSocketTest {
+    public static var allTests: [(String, (UDPSocketTests) -> () throws -> Void)] {
         return [
            ("testBasicEcho", testBasicEcho),
         ]
     }
-
 }
