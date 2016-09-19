@@ -2,5 +2,5 @@ import XCTest
 @testable import UDPTests
 
 XCTMain([
-    testCase(UDPTests.allTests)
+    testCase(UDPSocketTests.allTests)
 ])
